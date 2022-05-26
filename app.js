@@ -24,9 +24,8 @@ app.get("/wise-sayings/random", async (req, res) => {
     FROM wise_saying
     ORDER BY RAND()
     LIMIT 1
-    `,
-    [id]
-  );
+    `
+     );
 
   if (wiseSayingRow === undefined) {
     res.status(404).json({
@@ -36,6 +35,17 @@ app.get("/wise-sayings/random", async (req, res) => {
     return;
   }
 
+  wiseSayingRow.hitCount++;
+
+   await pool.query(
+    `
+    UPDATE wise_saying
+    SET hitCount = ?
+    WHERE id =?
+    `,
+    [wiseSayingRow.hitCount, wiseSayingRow.id]
+     );
+
   res.json({
     resultCode: "S-1",
     msg: "성공",
@@ -44,5 +54,5 @@ app.get("/wise-sayings/random", async (req, res) => {
 });
 
 app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`);
+  console.log(`Wise saying app listening on port ${port}`);
 });
